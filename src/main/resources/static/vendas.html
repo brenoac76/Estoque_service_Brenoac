@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendas</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .edit-form-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .edit-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 500px;
+            max-width: 90%;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-results {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+        }
+        .search-results li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .search-results li:hover {
+            background-color: #f0f0f0;
+        }
+        .add-item-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #itens-venda-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        #itens-venda-table th, #itens-venda-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .total-container {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <a href="index.html" class="brand-logo">Estoque Service</a>
+        <ul class="nav-links">
+            <li><a href="produtos.html">Produtos</a></li>
+            <li><a href="fornecedores.html">Fornecedores</a></li>
+            <li><a href="clientes.html">Clientes</a></li>
+            <li><a href="vendas.html">Vendas</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="content">
+    <h1>Vendas</h1>
+    <div id="message" class="output"></div>
+
+    <div class="container">
+        <h2>Registrar Venda</h2>
+        <form id="form-venda-create">
+            <div class="search-container">
+                <input type="text" id="cliente-search-input" placeholder="Buscar Cliente por Nome" required>
+                <input type="hidden" id="venda-cliente-id">
+                <ul id="cliente-search-results" class="search-results"></ul>
+            </div>
+
+            <div class="add-item-form">
+                <div class="search-container" style="flex-grow: 1;">
+                    <input type="text" id="produto-search-input" placeholder="Buscar Produto por Nome">
+                    <input type="hidden" id="venda-produto-id">
+                    <input type="hidden" id="venda-produto-preco-unitario">
+                    <ul id="produto-search-results" class="search-results"></ul>
+                </div>
+                <input type="number" id="venda-quantidade" placeholder="Qtd" min="1" style="width: 80px;">
+                <button type="button" onclick="adicionarItem()">Adicionar Produto</button>
+            </div>
+
+            <h3>Itens da Venda</h3>
+            <table id="itens-venda-table">
+                <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Qtd</th>
+                    <th>Preço Unitário</th>
+                    <th>Subtotal</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody id="itens-venda-list">
+                </tbody>
+            </table>
+            <div class="total-container">
+                Total da Venda: <span id="venda-total">R$ 0,00</span><br>
+                Total de Itens: <span id="venda-total-itens">0</span>
+            </div>
+
+            <button type="submit">Registrar Venda</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>Histórico de Vendas</h2>
+        <div id="output-venda-list"></div>
+    </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>

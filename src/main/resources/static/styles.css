@@ -1,0 +1,53 @@
+body { font-family: sans-serif; padding: 0; margin: 0; background-color: #f4f4f9; color: #333; }
+h1 { color: #2c3e50; }
+h2 { border-bottom: 2px solid #3498db; padding-bottom: 5px; color: #34495e; }
+.container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+form { display: flex; flex-direction: column; gap: 10px; }
+input, textarea, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+button { background-color: #3498db; color: white; border: none; cursor: pointer; transition: background-color 0.3s ease; }
+button:hover { background-color: #2980b9; }
+.output { margin-top: 15px; }
+.error { color: #e74c3c; font-weight: bold; }
+.success { color: #2ecc71; font-weight: bold; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+.delete-button { background-color: #e74c3c; }
+.delete-button:hover { background-color: #c0392b; }
+
+/* Estilos para a navegação */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    padding: 15px 30px;
+    color: white;
+}
+.brand-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+.nav-links li {
+    margin-left: 20px;
+}
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+.nav-links a:hover {
+    color: #3498db;
+}
+.content {
+    padding: 20px;
+}

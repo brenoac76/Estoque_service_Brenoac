@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fornecedores</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <a href="index.html" class="brand-logo">Estoque Service</a>
+        <ul class="nav-links">
+            <li><a href="produtos.html">Produtos</a></li>
+            <li><a href="fornecedores.html">Fornecedores</a></li>
+            <li><a href="clientes.html">Clientes</a></li>
+            <li><a href="vendas.html">Vendas</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="content">
+    <h1>Fornecedores</h1>
+    <div id="message" class="output"></div>
+
+    <div class="container">
+        <h2>Cadastrar Fornecedor</h2>
+        <form id="form-fornecedor-create">
+            <input type="text" id="fornecedor-nome" placeholder="Nome" required>
+            <input type="text" id="fornecedor-cnpj" placeholder="CNPJ" required>
+            <input type="email" id="fornecedor-email" placeholder="E-mail" required>
+            <button type="submit">Criar Fornecedor</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>Listar Fornecedores</h2>
+        <button onclick="listFornecedores()">Listar Todos</button>
+        <div id="output-fornecedor-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Buscar Fornecedor por ID</h2>
+        <form id="form-fornecedor-get">
+            <input type="number" id="fornecedor-id-get" placeholder="ID do Fornecedor" required>
+            <button type="submit">Buscar Fornecedor</button>
+            <div id="output-fornecedor-get"></div>
+        </form>
+    </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
