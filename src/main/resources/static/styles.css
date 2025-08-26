@@ -1,53 +1,338 @@
-body { font-family: sans-serif; padding: 0; margin: 0; background-color: #f4f4f9; color: #333; }
-h1 { color: #2c3e50; }
-h2 { border-bottom: 2px solid #3498db; padding-bottom: 5px; color: #34495e; }
-.container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
-form { display: flex; flex-direction: column; gap: 10px; }
-input, textarea, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-button { background-color: #3498db; color: white; border: none; cursor: pointer; transition: background-color 0.3s ease; }
-button:hover { background-color: #2980b9; }
-.output { margin-top: 15px; }
-.error { color: #e74c3c; font-weight: bold; }
-.success { color: #2ecc71; font-weight: bold; }
-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-th { background-color: #f2f2f2; }
-.delete-button { background-color: #e74c3c; }
-.delete-button:hover { background-color: #c0392b; }
+/* Importação de fontes do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-/* Estilos para a navegação */
+/* Reset básico e configurações globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    font-size: 16px; /* Tamanho de fonte base */
+}
+
+/* Header e Navegação */
 .navbar {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 1rem 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #2c3e50;
-    padding: 15px 30px;
-    color: white;
+    border-bottom: 5px solid #3498db;
 }
+
 .brand-logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ecf0f1;
     text-decoration: none;
+    transition: color 0.3s;
 }
-.nav-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
-.nav-links li {
-    margin-left: 20px;
-}
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    transition: color 0.3s ease;
-}
-.nav-links a:hover {
+
+.brand-logo:hover {
     color: #3498db;
 }
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+    color: #3498db;
+}
+
+/* Conteúdo Principal */
 .content {
-    padding: 20px;
+    padding: 2rem 0;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.content h1 {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.container {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.container h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+/* Formulários */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+form input,
+form textarea,
+form button {
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+form input:focus,
+form textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Torna o campo de texto de descrição não redimensionável */
+form textarea {
+    resize: none;
+}
+
+form button {
+    background-color: #2ecc71;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+form button:hover {
+    background-color: #27ae60;
+}
+
+/* Telas de Edição (Modal) */
+.edit-form-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.edit-form {
+    background-color: #fff;
+    padding: 2em;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.edit-form h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5em;
+}
+
+.edit-form input,
+.edit-form textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.edit-form .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+    margin-top: 1em;
+}
+
+.edit-form button[type="submit"] {
+    background-color: #3498db;
+    color: white;
+    font-weight: 700;
+}
+
+.edit-form button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+.edit-form button[type="button"] { /* Botão Cancelar */
+    background-color: #e74c3c;
+    color: white;
+    font-weight: 700;
+}
+
+.edit-form button[type="button"]:hover {
+    background-color: #c0392b;
+}
+
+/* Mensagens de feedback */
+.output {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.output.success {
+    background-color: #e8f9f3;
+    color: #27ae60;
+    border: 1px solid #27ae60;
+}
+
+.output.error {
+    background-color: #fbecec;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+/* Listagem de dados (Tabela) */
+#output-produto-list,
+#output-fornecedor-list,
+#output-cliente-list,
+#output-venda-list {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem; /* Fonte menor para dados da tabela */
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-weight: 700;
+}
+
+table tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-buttons button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.action-buttons .delete-button {
+    background-color: #e74c3c;
+    color: white;
+}
+.action-buttons .delete-button:hover {
+    background-color: #c0392b;
+}
+
+.action-buttons button:not(.delete-button) {
+    background-color: #3498db;
+    color: white;
+}
+.action-buttons button:not(.delete-button):hover {
+    background-color: #2980b9;
+}
+
+/* Destaque para linha de venda clicada */
+.venda-selecionada {
+    background-color: #e8f9f3 !important; /* Verde claro para a linha principal */
+    font-weight: bold;
+}
+
+.detalhes-container {
+    padding: 10px;
+    background-color: #f7f7f7; /* Fundo cinza claro para os detalhes */
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.detalhes-container h4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.itens-detalhe-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.itens-detalhe-table th,
+.itens-detalhe-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    font-size: 0.85rem; /* Fonte menor para os itens da venda */
+}
+
+.itens-detalhe-table tfoot {
+    font-weight: bold;
+}
+
+.search-input-container input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Efeito de fade-in para o modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

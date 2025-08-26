@@ -33,6 +33,22 @@
         </form>
     </div>
 
+    <div id="edit-fornecedor-form-container" class="edit-form-container" style="display:none;">
+        <div class="edit-form">
+            <h2>Editar Fornecedor</h2>
+            <form id="form-fornecedor-update">
+                <input type="hidden" id="edit-fornecedor-id">
+                <input type="text" id="edit-fornecedor-nome" placeholder="Nome" required>
+                <input type="text" id="edit-fornecedor-cnpj" placeholder="CNPJ" required>
+                <input type="email" id="edit-fornecedor-email" placeholder="E-mail" required>
+                <div class="button-group">
+                    <button type="submit">Atualizar</button>
+                    <button type="button" onclick="cancelEditFornecedor()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
         <h2>Listar Fornecedores</h2>
         <button onclick="listFornecedores()">Listar Todos</button>

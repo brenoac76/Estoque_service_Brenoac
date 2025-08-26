@@ -15,14 +15,20 @@ async function makeRequest(url, options) {
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
-            const error = await response.json();
-            showMessage(error.message || `Erro na requisição: ${response.status}`, 'error');
+            const errorText = await response.text();
+            try {
+                const errorJson = JSON.parse(errorText);
+                showMessage(errorJson.message || `Erro na requisição: ${response.status}`, 'error');
+            } catch (e) {
+                showMessage(`Erro na requisição: ${response.status} - ${errorText}`, 'error');
+            }
             return null;
         }
         if (options.method === 'DELETE') {
             return true;
         }
-        return await response.json();
+        const text = await response.text();
+        return text ? JSON.parse(text) : {};
     } catch (error) {
         showMessage(`Erro de conexão: ${error.message}`, 'error');
         return null;
@@ -56,7 +62,64 @@ function injectStyles() {
             width: 300px;
         }
         .itens-detalhe-table {
-            background-color: #f7f7f7; /* Tom mais claro para a tabela de itens */
+            background-color: #f7f7f7;
+        }
+        .edit-form-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .edit-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 500px;
+            max-width: 90%;
+            text-align: center;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-results {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+        }
+        .search-results li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .search-results li:hover {
+            background-color: #f0f0f0;
+        }
+        .search-input-container {
+            margin-bottom: 20px;
+        }
+        .search-input-container input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
         }
     `;
     document.head.appendChild(style);
@@ -68,15 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('form-produto-create')) {
         listProdutos();
         document.getElementById('form-produto-create').addEventListener('submit', createProduto);
+        const formUpdateProduto = document.getElementById('form-produto-update');
+        if (formUpdateProduto) {
+            formUpdateProduto.addEventListener('submit', updateProduto);
+        }
         document.getElementById('produto-filter-input').addEventListener('input', (e) => {
             const query = e.target.value;
             listProdutos(query);
         });
     }
+
     if (document.getElementById('form-fornecedor-create')) {
         listFornecedores();
         document.getElementById('form-fornecedor-create').addEventListener('submit', createFornecedor);
+        const formUpdateFornecedor = document.getElementById('form-fornecedor-update');
+        if (formUpdateFornecedor) {
+            formUpdateFornecedor.addEventListener('submit', updateFornecedor);
+        }
     }
+
     if (document.getElementById('form-cliente-create')) {
         listClientes();
         document.getElementById('form-cliente-create').addEventListener('submit', createCliente);
@@ -85,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             editClientForm.addEventListener('submit', updateCliente);
         }
     }
+
     if (document.getElementById('form-venda-create')) {
         listVendas();
         setupSearch('cliente-search-input', 'venda-cliente-id', 'cliente-search-results', 'clientes');
@@ -154,6 +228,47 @@ async function listProdutos(query = '') {
     }
 }
 
+async function editProduto(id) {
+    const produto = await makeRequest(`${API_BASE_URL}/produtos/${id}`, { method: 'GET' });
+    if (produto) {
+        document.getElementById('edit-produto-form-container').style.display = 'flex';
+        document.getElementById('edit-produto-id').value = produto.id;
+        document.getElementById('edit-produto-nome').value = produto.nome;
+        document.getElementById('edit-produto-descricao').value = produto.descricao;
+        document.getElementById('edit-produto-quantidade').value = produto.quantidade;
+        document.getElementById('edit-produto-preco-custo').value = produto.precoDeCusto;
+        document.getElementById('edit-produto-valor-venda').value = produto.valorDeVenda;
+    }
+}
+
+function cancelEditProduto() {
+    document.getElementById('edit-produto-form-container').style.display = 'none';
+}
+
+async function updateProduto(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-produto-id').value;
+    const payload = {
+        id: id,
+        nome: document.getElementById('edit-produto-nome').value,
+        descricao: document.getElementById('edit-produto-descricao').value,
+        quantidade: parseInt(document.getElementById('edit-produto-quantidade').value),
+        precoDeCusto: parseFloat(document.getElementById('edit-produto-preco-custo').value),
+        valorDeVenda: parseFloat(document.getElementById('edit-produto-valor-venda').value)
+    };
+
+    const updatedProduto = await makeRequest(`${API_BASE_URL}/produtos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    if (updatedProduto) {
+        showMessage('Produto atualizado com sucesso!', 'success');
+        cancelEditProduto();
+        listProdutos();
+    }
+}
+
 async function deleteProduto(id) {
     const result = await makeRequest(`${API_BASE_URL}/produtos/${id}`, { method: 'DELETE' });
     if (result) {
@@ -166,10 +281,10 @@ async function deleteProduto(id) {
 async function createFornecedor(event) {
     event.preventDefault();
     const nome = document.getElementById('fornecedor-nome').value;
-    const contato = document.getElementById('fornecedor-contato').value;
-    const endereco = document.getElementById('fornecedor-endereco').value;
+    const cnpj = document.getElementById('fornecedor-cnpj').value;
+    const email = document.getElementById('fornecedor-email').value;
 
-    const payload = { nome, contato, endereco };
+    const payload = { nome, cnpj, email };
     const fornecedor = await makeRequest(`${API_BASE_URL}/fornecedores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -186,14 +301,14 @@ async function listFornecedores() {
     const fornecedores = await makeRequest(`${API_BASE_URL}/fornecedores`, { method: 'GET' });
     const outputDiv = document.getElementById('output-fornecedor-list');
     if (fornecedores && outputDiv) {
-        let tableHtml = '<table><thead><tr><th>ID</th><th>Nome</th><th>Contato</th><th>Endereço</th><th>Ações</th></tr></thead><tbody>';
+        let tableHtml = '<table><thead><tr><th>ID</th><th>Nome</th><th>CNPJ</th><th>E-mail</th><th>Ações</th></tr></thead><tbody>';
         fornecedores.forEach(fornecedor => {
             tableHtml += `
                 <tr>
                     <td>${fornecedor.id}</td>
                     <td>${fornecedor.nome}</td>
-                    <td>${fornecedor.contato}</td>
-                    <td>${fornecedor.endereco}</td>
+                    <td>${fornecedor.cnpj}</td>
+                    <td>${fornecedor.email}</td>
                     <td>
                         <button onclick="editFornecedor(${fornecedor.id})">Editar</button>
                         <button class="delete-button" onclick="deleteFornecedor(${fornecedor.id})">Excluir</button>
@@ -203,6 +318,42 @@ async function listFornecedores() {
         });
         tableHtml += '</tbody></table>';
         outputDiv.innerHTML = tableHtml;
+    }
+}
+
+async function editFornecedor(id) {
+    const fornecedor = await makeRequest(`${API_BASE_URL}/fornecedores/${id}`, { method: 'GET' });
+    if (fornecedor) {
+        document.getElementById('edit-fornecedor-form-container').style.display = 'flex';
+        document.getElementById('edit-fornecedor-id').value = fornecedor.id;
+        document.getElementById('edit-fornecedor-nome').value = fornecedor.nome;
+        document.getElementById('edit-fornecedor-cnpj').value = fornecedor.cnpj;
+        document.getElementById('edit-fornecedor-email').value = fornecedor.email;
+    }
+}
+
+function cancelEditFornecedor() {
+    document.getElementById('edit-fornecedor-form-container').style.display = 'none';
+}
+
+async function updateFornecedor(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-fornecedor-id').value;
+    const payload = {
+        nome: document.getElementById('edit-fornecedor-nome').value,
+        cnpj: document.getElementById('edit-fornecedor-cnpj').value,
+        email: document.getElementById('edit-fornecedor-email').value
+    };
+
+    const updatedFornecedor = await makeRequest(`${API_BASE_URL}/fornecedores/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    if (updatedFornecedor) {
+        showMessage('Fornecedor atualizado com sucesso!', 'success');
+        cancelEditFornecedor();
+        listFornecedores();
     }
 }
 
@@ -373,7 +524,6 @@ async function adicionarItem() {
         return;
     }
 
-    // Validação de estoque no front-end
     const produto = await makeRequest(`${API_BASE_URL}/produtos/${produtoId}`, { method: 'GET' });
     if (!produto || produto.quantidade < quantidade) {
         showMessage('Quantidade insuficiente em estoque.', 'error');
@@ -382,7 +532,6 @@ async function adicionarItem() {
 
     const itemExistente = itensVenda.find(item => item.produtoId === produtoId);
     if (itemExistente) {
-        // Valida se a quantidade total (existente + nova) não excede o estoque
         if ((itemExistente.quantidade + quantidade) > produto.quantidade) {
             showMessage(`A quantidade total do produto '${produto.nome}' excede o estoque disponível (${produto.quantidade}).`, 'error');
             return;
@@ -504,12 +653,12 @@ async function listVendas() {
                     totalValorNaVenda += subtotal;
 
                     tableHtml += `
-                                    <tr>
-                                        <td>${item.produto.nome}</td>
-                                        <td>${item.quantidade}</td>
-                                        <td><div style="display: flex; justify-content: space-between; align-items: center; padding: 0 5px;"><span>R$</span><span>${formatCurrencyBRL(preco)}</span></div></td>
-                                        <td><div style="display: flex; justify-content: space-between; align-items: center; padding: 0 5px;"><span>R$</span><span>${formatCurrencyBRL(subtotal)}</span></div></td>
-                                    </tr>`;
+                                        <tr>
+                                            <td>${item.produto.nome}</td>
+                                            <td>${item.quantidade}</td>
+                                            <td><div style="display: flex; justify-content: space-between; align-items: center; padding: 0 5px;"><span>R$</span><span>${formatCurrencyBRL(preco)}</span></div></td>
+                                            <td><div style="display: flex; justify-content: space-between; align-items: center; padding: 0 5px;"><span>R$</span><span>${formatCurrencyBRL(subtotal)}</span></div></td>
+                                        </tr>`;
                 });
 
                 tableHtml += `
